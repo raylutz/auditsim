@@ -103,44 +103,52 @@ with col1:
 
 col0, col1, col2, col3 = st.columns(4)
 with col0:
-    st.slider      ("Noise %",          min_value=0.0,  max_value=10.,  value=0.2,  step=0.1, key='noise_pct',
+    st.slider("Noise %",          min_value=0.0,  max_value=10.,  value=0.2,  step=0.1, key='noise_pct',
                 help="Typically, about 0.2% noise is expected due to voter errors")
                 
 with col1:
-    st.slider      ("Flip Hack %",      min_value=0.0,  max_value=10.,  value=0.0,  step=0.1, key='hack_pct',
+    st.slider("Flip Hack %",      min_value=0.0,  max_value=10.,  value=0.0,  step=0.1, key='hack_pct',
                 help="Normal errors result in 1-vote over or under statements. Even one flipped vote on a ballot "
                 "should prompt a full hand count because it is likely due to a malicious act. Thus, leave this at 0.")
 
 with col2:
-    st.slider      ("Samples per trial", min_value=100, max_value=5000, value=1000, step=100, key='n_samples',
+    n_samples = st.slider("Samples per trial", min_value=100, max_value=5000, value=1000, step=100, key='n_samples',
                 help="Depending on how close the election is, the number of samples should be at least twice "
                 "the number of samples expected in the audit. The number of sampled does not affect how many "
                 "ballot samples are needed in the actual audit, and are only for the visualization.")
 
 with col3:
-    st.slider      ("Number of trials",  min_value=100, max_value=5000, value=1000, step=100, key='n_trials',
+    st.slider("Number of trials",  min_value=100, max_value=1000, value=1000, step=100, key='n_trials',
                 help="To form a good visualization, about 1000 trails per hypothesis is normal, but the "
                 "simulation will run faster if this is reduced.")
 
 # Plot controls
 col0, col1, col2, col3 = st.columns(4)
 with col0:
-    st.checkbox    ("Plot H0 trials",   value=True, key='plot_H0_trials',
+    st.checkbox("Plot H0 trials",   value=True, key='plot_H0_trials',
                 help="Include the green H0 'null hypothesis' audit trails cloud in the visualization")
 with col1:
-    st.checkbox    ("Plot H1 trials",   value=True, key='plot_H1_trials',
+    st.checkbox("Plot H1 trials",   value=True, key='plot_H1_trials',
                 help="Include the red H1 'hacked hypothesis' audit trails cloud in the visualization")
+
 with col2:
-    st.checkbox    ("Plot H0 contours", value=True, key='plot_H0_contours',
+    st.slider("Samples displayed", min_value=10, max_value=n_samples, value=min(1000, n_samples), step=10, key='n_samples_disp',
+                help="Depending on how close the election is, the number of samples should be at least twice "
+                "the number of samples expected in the audit. The number of sampled does not affect how many "
+                "ballot samples are needed in the actual audit, and are only for the visualization.")
+
+col0, col1, col2, col3 = st.columns(4)
+with col0:
+    st.checkbox("Plot H0 contours", value=True, key='plot_H0_contours',
                 help="Include the mean and risk contours in for the H0 null hypothesis")
-with col3:
-    st.checkbox    ("Plot H1 contours", value=True, key='plot_H1_contours',
+with col1:
+    st.checkbox("Plot H1 contours", value=True, key='plot_H1_contours',
                 help="Include the mean and risk contours in for the H1 hacked hypothesis")
 
 ui_keys = ['election_name', 'n_total', 'A_votes', 'B_votes', 'margin_pct',
-            'RLA_samples', 'RLA_net_OS',
-            'noise_pct', 'hack_pct', 'n_samples', 'n_trials', 
-            'plot_H0_trials', 'plot_H1_trials', 'plot_H0_contours', 'plot_H1_contours']
+                'RLA_samples', 'RLA_net_OS',
+                'noise_pct', 'hack_pct', 'n_samples', 'n_trials', 'n_samples_disp',
+                'plot_H0_trials', 'plot_H1_trials', 'plot_H0_contours', 'plot_H1_contours']
 
 # Run button
 if st.button("Run Simulation"):

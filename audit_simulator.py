@@ -102,7 +102,7 @@ def gen_op_plan(changes: dict[str, bool], test_state: dict | None) -> dict[str, 
     """
     model_keys  = ['n_total', 'margin_pct', 'noise_pct', 'hack_pct']
     sample_keys = ['n_samples', 'n_trials']
-    plot_keys   = ['plot_H0_trials', 'plot_H1_trials', 'plot_H0_contours', 'plot_H1_contours']
+    plot_keys   = ['plot_H0_trials', 'plot_H1_trials', 'plot_H0_contours', 'plot_H1_contours', 'n_samples_disp']
 
     if test_state:
         op_plan = {}
@@ -161,11 +161,11 @@ def gen_election_instance(
     Generate a single election instance (H0 or H1) using block sizes and cumulative bin boundaries.
     """
     n_total         = op_state.get('n_total',       110_000)
-    A_votes         = op_state.get('A_votes',        51_500)
-    B_votes         = op_state.get('B_votes',        48_500)
-    margin_pct      = op_state.get('margin_pct',          3)
-    noise1_pct      = op_state.get('noise1_pct',         .2)
-    hack2_pct       = op_state.get('hack2_pct',           0)
+    A_votes         = op_state.get('A_votes',       51_500)
+    B_votes         = op_state.get('B_votes',       48_500)
+    margin_pct      = op_state.get('margin_pct',    3)
+    noise1_pct      = op_state.get('noise1_pct',    .2)
+    hack2_pct       = op_state.get('hack2_pct',     0)
 
     margin_frac = margin_pct / 100
     noise1_frac = noise1_pct / 100
@@ -380,13 +380,14 @@ def gen_plots(
     riskidx5percent     = RiskText.index("5%")
 
 
-    n_total     = op_state.get('n_total',       100_000)
-    margin_pct  = op_state.get('margin_pct',    3)
-    noise1_pct  = op_state.get('noise1_pct',    .2)
-    hack2_pct   = op_state.get('hack2_pct',     0)
-    n_samples   = op_state.get('n_samples',     500)
-    n_trials    = op_state.get('n_trials',      1000)
-    replace     = op_state.get('replace',       False)
+    n_total         = op_state.get('n_total',       100_000)
+    margin_pct      = op_state.get('margin_pct',    3)
+    noise1_pct      = op_state.get('noise1_pct',    .2)
+    hack2_pct       = op_state.get('hack2_pct',     0)
+    n_samples       = op_state.get('n_samples',     500)
+    n_trials        = op_state.get('n_trials',      1000)
+    replace         = op_state.get('replace',       False)
+    n_samples_disp  = op_state.get('n_samples_disp', n_samples)
     
     stats       = op_state.get('stats', {})
     
@@ -402,8 +403,8 @@ def gen_plots(
         CS = stats[hyp]["CS"]
         for r in range(min(n_trials, CS.shape[0])):
             fig.add_trace(go.Scatter(
-                x=x_axis,
-                y=CS[r],
+                x=x_axis,                               # [0:n_samples_disp],
+                y=CS[r],                                # [0:n_samples_disp],
                 mode='lines',
                 line=dict(color=color, width=1.5),
                 opacity=0.4,
@@ -419,8 +420,8 @@ def gen_plots(
         sd = stats[hyp]["SD"]
 
         fig.add_trace(go.Scatter(
-            x=x_axis,
-            y=mean,
+            x=x_axis,                                   # [0:n_samples_disp],
+            y=mean,                                     # [0:n_samples_disp],
             mode='lines',
             name=f"{hyp} Contours",
             line=dict(color=color, width=2),
@@ -433,38 +434,39 @@ def gen_plots(
 
             SD_mult_value = SD_mult[riskidx]
             
+            width = len(mean)                           # n_samples_disp
             if hyp == 'H0':
-                mid_x = 7 * len(mean) // 8
+                text_x = 7 * width // 8
             else:    
-                mid_x = 3 * len(mean) // 4
+                text_x = 3 * width // 4
             
             fig.add_trace(go.Scatter(
-                x   = x_axis,
-                y   = mean - SD_mult_value * sd,
+                x   = x_axis,                           # [0:n_samples_disp],
+                y   = (mean - SD_mult_value * sd),      # [0:n_samples_disp],
                 mode = 'lines',
                 name = f"{hyp} Risk",
                 line = dict(color=color, width=1),
                 showlegend=False,
                 ))
             fig.add_trace(go.Scatter(
-                x   = x_axis,
-                y   = mean + SD_mult_value * sd,
+                x   = x_axis,                           # [0:n_samples_disp],
+                y   = (mean + SD_mult_value * sd),      # [0:n_samples_disp],
                 mode = 'lines',
                 name = f"{hyp} Risk",
                 line = dict(color=color, width=1),
                 showlegend=False,
                 ))
-            y1 = mean[mid_x] - SD_mult_value * sd[mid_x]     # upper
-            y2 = mean[mid_x] + SD_mult_value * sd[mid_x]     # lower
+            y1 = mean[text_x] - SD_mult_value * sd[text_x]     # upper
+            y2 = mean[text_x] + SD_mult_value * sd[text_x]     # lower
             fig.add_annotation(
-                x=mid_x, y=y1,
+                x=text_x, y=y1,
                 text=f"{RiskText[riskidx]}",
                 showarrow=False,
                 font=dict(color=color, size=10),
                 yanchor="bottom",
             )
             fig.add_annotation(
-                x=mid_x, y=y2,
+                x=text_x, y=y2,
                 text=f"{RiskText[riskidx]}",
                 showarrow=False,
                 font=dict(color=color, size=10),
