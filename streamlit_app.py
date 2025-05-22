@@ -49,11 +49,13 @@ The goal is to determine whether a given sample size is sufficient to:
 col0, col1 = st.columns(2)
 
 ELECTION_PRESETS = {
-    "Default":           {"label": "Default", 
+    "Choose a preset":   {"label": "Default", 
                             "n_total": 110000,  "A_votes": 51500,  "B_votes": 48500,  'RLA_samples':0,   'RLA_net_OS':0},
     "NV 2024 President": {"label": "NV 2024 Presidential Contest", 
                             "n_total": 1487887, "A_votes": 751205, "B_votes": 705197, 'RLA_samples':220, 'RLA_net_OS':0},
-}
+    }
+                            
+
 with col0:
     election_choice = st.selectbox("Select election preset:", options=list(ELECTION_PRESETS.keys()))
     preset = ELECTION_PRESETS[election_choice]
