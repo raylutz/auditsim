@@ -162,4 +162,10 @@ ui_keys = ['election_name', 'n_total', 'A_votes', 'B_votes', 'margin_pct',
 
 # Run button
 if st.button("Run Simulation"):
-    main(ui_keys=ui_keys)  # This function should internally call st.plotly_chart()
+    progress = st.progress(0)
+    status_box = st.empty()
+    status_box.text("🔄 Starting simulation...")
+    fig = main(ui_keys=ui_keys, status_box=status_box)  # This function should internally call st.plotly_chart()
+
+    st.plotly_chart(fig, use_container_width=True)
+

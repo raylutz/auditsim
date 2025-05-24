@@ -3,6 +3,7 @@
 import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 import pprint
 
 from typing import List, Dict, Any, Tuple, Optional, Union, Set, cast, Type, Iterable, Callable
@@ -15,16 +16,16 @@ T_doda = Dict[str, Dict[str, Any]]
 T_lor  = List[range]
 
 
-def main(ui_keys: list[str], test_state: dict=None):
+def main(ui_keys: list[str], status_box: DeltaGenerator, test_state: dict=None):
 
     changes, op_state = get_state(ui_keys, test_state)
     
     op_plan = gen_op_plan(changes, test_state)
     
-    gen_election_model  (op_plan, op_state)
-    gen_samples         (op_plan, op_state)
-    gen_stats           (op_plan, op_state)
-    gen_plots           (op_plan, op_state)
+    gen_election_model  (op_plan, op_state, status_box)
+    gen_samples         (op_plan, op_state, status_box)
+    gen_stats           (op_plan, op_state, status_box)
+    gen_plots           (op_plan, op_state, status_box)
 
     if test_state:
         return op_state['fig']
@@ -39,9 +40,7 @@ def main(ui_keys: list[str], test_state: dict=None):
     st.session_state["op_state"] = op_state  # remember state for next pass
     print(pprint.pformat(op_state, sort_dicts=False))
     
-    st.plotly_chart(fig, use_container_width=True)
-
-    return None
+    return fig
     
 
 def get_state(
@@ -130,6 +129,7 @@ def gen_op_plan(changes: dict[str, bool], test_state: dict | None) -> dict[str, 
 def gen_election_model(
         op_plan,
         op_state,
+        status_box,
         ) -> None: # updates op_state    
     """
     Generate both H0 (null) and H1 (flipped) election models.
@@ -139,8 +139,11 @@ def gen_election_model(
         op_state['meta_doda']:  {"H0": meta_H0,  "H1": meta_H1}
     """
     if not op_plan['gen_model_flag']:
-        return
-    
+        return        
+    msg = "Creating Election model..."
+    status_box.text(msg)
+    print(msg)    
+
     votes_dodi = {}
     meta_doda  = {}
 
@@ -256,7 +259,9 @@ def gen_samples(
     meta_doda   = op_state.get('meta_doda', {})
     votes_dodi  = op_state.get('votes_dodi', {})
     
-    print(f"Creating {n_trials} audit trials, each with {n_samples} samples per case...")
+    msg = f"Creating {n_trials} audit trials, each with {n_samples} samples per case..."
+    status_box.text(msg)
+    print(msg)    
 
     bin_samples_donpa = {"H0": np.zeros((n_trials, n_samples), dtype=int),
                          "H1": np.zeros((n_trials, n_samples), dtype=int)}
@@ -331,8 +336,9 @@ def gen_stats(
     """
     if not op_plan['gen_stats_flag']:
         return
-        
-    print("Generating stats: OS, CS, Mean, SD...")
+    msg = f"Creating stats..."
+    status_box.text(msg)
+    print(msg)    
     
     bin_samples = op_state['bin_samples']
     meta_doda   = op_state['meta_doda']
@@ -368,6 +374,10 @@ def gen_plots(
         op_plan,
         op_state,
         ) -> None:   
+
+    msg = f"Creating plots..."
+    status_box.text(msg)
+    print(msg)    
 
     # from scipy.stats import norm
 
