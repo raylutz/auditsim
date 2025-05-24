@@ -157,7 +157,7 @@ with col1:
 
 ui_keys = ['election_name', 'n_total', 'A_votes', 'B_votes', 'margin_pct',
                 'RLA_samples', 'RLA_net_OS',
-                'noise_pct', 'hack_pct', 'n_samples', 'n_trials', 'n_samples_disp',
+                'noise1_pct', 'hack_pct', 'n_samples', 'n_trials', 'n_samples_disp',
                 'plot_H0_trials', 'plot_H1_trials', 'plot_H0_contours', 'plot_H1_contours']
 
 # Run button

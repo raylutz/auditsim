@@ -60,7 +60,7 @@ def get_state(
     # current_state = {
         # 'n_total':    st.session_state['n_total'],
         # 'margin_pct': st.session_state['margin_pct'],
-        # 'noise_pct':  st.session_state['noise_pct'],
+        # 'noise1_pct': st.session_state['noise1_pct'],
         # 'hack_pct':   st.session_state['hack_pct'],
         # 'n_samples':  st.session_state['n_samples'],
         # 'n_trials':   st.session_state['n_trials'],
