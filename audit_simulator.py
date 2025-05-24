@@ -242,6 +242,7 @@ def gen_election_instance(
 def gen_samples(
         op_plan,
         op_state,
+        status_box,
         ) -> None: # updates op_state    
     """
     Generate audit trials by sampling bin numbers from each election model (H0, H1).
@@ -319,6 +320,7 @@ def classify_bins_9bins(B: np.ndarray, thresholds: list[int]) -> np.ndarray:
 def gen_stats(
         op_plan,
         op_state,
+        status_box,
         ) -> None: # updates op_state    
     """
     Generate OS (overstatements), CS (cumulative sums), Mean, and SD across trials.
@@ -373,6 +375,7 @@ def gen_stats(
 def gen_plots(
         op_plan,
         op_state,
+        status_box,
         ) -> None:   
 
     msg = f"Creating plots..."
