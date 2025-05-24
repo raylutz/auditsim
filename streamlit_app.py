@@ -3,6 +3,7 @@ from audit_simulator import main
 
 # ------------------------
 # Page setup and UI
+
 # ------------------------
 
 st.set_page_config(page_title="RLA Simulator", layout="wide")
@@ -15,25 +16,30 @@ This tool simulates risk-limiting audits (RLAs) using Monte Carlo methods.
 Adjust the parameters below and click Run Simulation to visualize how audits 
 perform under different election scenarios.
 
-## ⚙️ How It Works
+## How It Works
 The simulator models two versions of an election:
 
 1. H0 (Null hypothesis): The reported results are correct — the stated winner actually won.
 2. H1 (Alternative hypothesis): The true outcome is flipped — the reported loser actually won by one vote.
 
-Each ballot is classified into one of nine categories, depending on how it affects the reported margin:
+Each ballot is classified into one of nine categories, depending on how it affects the reported margin,
+where A is the reported winning candidate and B is the reported loser.
 
-1. Vote for the winner (unchanged)
-2. Vote for the loser (unchanged)
-3. No vote in the contest (unchanged)
-4. Overstatement: No-vote → loser (+1)
-5. Overstatement: Winner → no-vote (+1)
-6. Understatement: No-vote → winner (−1)
-7. Understatement: Loser → no-vote (−1)
-8. Flip: Winner → loser (+2 overstatement)
-9. Flip: Loser → winner (−2 understatement)
+|  Case  |  Stated Results  |  True Results  |  Comment                     |
++:------:+:----------------:+:--------------:+:-----------------------------+
+|   1.   |   A: 1; B: 0     |   A: 1; B: 0   | No Change (vote for winner)  |
+|   2.   |   A: 0; B: 1     |   A: 0; B: 1   | No Change (vote for loser)   |
+|   3.   |   A: 0; B: 0     |   A: 0; B: 0   | No Change (vote for neither) |
+|   4.   |   A: 0; B: 0     |   A: 0; B: 1   | +1 Overstatement  (B +1)     |
+|   5.   |   A: 1; B: 0     |   A: 0; B: 0   | +1 Overstatement  (A -1)     |
+|   6.   |   A: 0; B: 1     |   A: 0; B: 0   | -1 Understatement (B -1)     |
+|   7.   |   A: 0; B: 0     |   A: 1; B: 0   | -1 Understatement (A +1)     |
+|   8.   |   A: 1; B: 0     |   A: 0; B: 1   | +2 Overstatement  (A -1, B +1)     |
+|   9.   |   A: 0; B: 1     |   A: 1; B: 0   | -2 Understatement (A +1, B -1)     |
 
-## 📉 Noise and Trial Simulation
+Note that to remove a vote from a candidate, the vote must be given to the No-vote group or another candidate.
+
+## Noise and Trial Simulation
 You can optionally add noise: random misinterpretations or marking errors that don't 
 systematically favor either side but may affect totals.
 
@@ -105,12 +111,14 @@ with col1:
 
 col0, col1, col2, col3 = st.columns(4)
 with col0:
-    st.slider("Noise %",          min_value=0.0,  max_value=10.,  value=0.2,  step=0.1, key='noise_pct',
-                help="Typically, about 0.2% noise is expected due to voter errors")
+    st.slider("Noise %",          min_value=0.0,  max_value=10.,  value=0.2,  step=0.1, key='noise1_pct',
+                help="Typically, about 0.2% noise is expected due to voter errors. These are expressed as an equal number of "
+                "overstatements and understatements.")
                 
 with col1:
     st.slider("Flip Hack %",      min_value=0.0,  max_value=10.,  value=0.0,  step=0.1, key='hack_pct',
-                help="Normal errors result in 1-vote over or under statements. Even one flipped vote on a ballot "
+                help="% of alteration expressed as 2-vote flips. Normal (not malicious) errors result in 1-vote over or "
+                "under statements. Even one flipped vote on a ballot "
                 "should prompt a full hand count because it is likely due to a malicious act. Thus, leave this at 0.")
 
 with col2:
