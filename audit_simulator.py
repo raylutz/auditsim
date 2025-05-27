@@ -562,8 +562,9 @@ def main():
     # ------------------------
 
     st.set_page_config(page_title="RLA Simulator", layout="wide")
-
     st.title("RLA Simulator")
+    st.info("✅ Running updated code from audit_simulator.py")
+    
     with st.expander("ℹ️ About This Simulator (click to show/hide)"):
         markdown_with_tables("""   
 This tool simulates risk-limiting audits (RLAs) using Monte Carlo methods.
