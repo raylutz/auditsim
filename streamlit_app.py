@@ -38,7 +38,7 @@ Each ballot is classified into one of nine categories, depending on how it affec
 where A is the reported winning candidate and B is the reported loser.
 
 |  Case  |  Stated Results  |  True Results  |  Comment                     |
-+:------:+:----------------:+:--------------:+:-----------------------------+
+|:------:|:----------------:|:--------------:|:-----------------------------|
 |   1.   |   A: 1; B: 0     |   A: 1; B: 0   | No Change (vote for winner)  |
 |   2.   |   A: 0; B: 1     |   A: 0; B: 1   | No Change (vote for loser)   |
 |   3.   |   A: 0; B: 0     |   A: 0; B: 0   | No Change (vote for neither) |
