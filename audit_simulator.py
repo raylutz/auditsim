@@ -565,66 +565,69 @@ def main():
 
     st.title("RLA Simulator")
     with st.expander("ℹ️ About This Simulator (click to show/hide)"):
-        markdown_with_tables("""
-        
-    This tool simulates risk-limiting audits (RLAs) using Monte Carlo methods.
-    Adjust the parameters below and click Run Simulation to visualize how audits 
-    perform under different election scenarios. A Monte Carlo method allows determination of
-    statistical values without the use of sometimes complex equations, particular when 
-    samples are not replaced.
+        markdown_with_tables("""   
+This tool simulates risk-limiting audits (RLAs) using Monte Carlo methods.
+Adjust the parameters below and click Run Simulation to visualize how audits 
+perform under different election scenarios. A Monte Carlo method allows determination of
+statistical values without the use of sometimes complex equations, particular when 
+samples are not replaced.
 
-    ## How It Works
-    The simulator models two versions of an election:
+Currently, only a "ballot comparison" audit can be simulated. This type of audit requires
+that each ballot can be individually referenced in storage and also by the CVR (cast vote record)
+so they can be compared.
 
-    1. H0 (Null hypothesis): The reported results are correct — the stated winner actually won.
-    2. H1 (Alternative hypothesis): The true outcome is flipped — the reported loser actually won by one vote.
+## How It Works
+The simulator models two versions of an election:
 
-    Each ballot is classified into one of nine categories, depending on how it affects the reported margin,
-    where A is the reported winning candidate and B is the reported loser.
+1. H0 (Null hypothesis): The reported results are correct — the stated winner actually won.
+2. H1 (Alternative hypothesis): The true outcome is flipped — the reported loser actually won by one vote.
 
-    |  Case  |  Stated Results  |  True Results  |  Comment                     |
-    |:------:|:----------------:|:--------------:|:-----------------------------|
-    |   1.   |   A: 1; B: 0     |   A: 1; B: 0   | No Change (vote for winner)  |
-    |   2.   |   A: 0; B: 1     |   A: 0; B: 1   | No Change (vote for loser)   |
-    |   3.   |   A: 0; B: 0     |   A: 0; B: 0   | No Change (vote for neither) |
-    |   4.   |   A: 0; B: 0     |   A: 0; B: 1   | +1 Overstatement  (B +1)     |
-    |   5.   |   A: 1; B: 0     |   A: 0; B: 0   | +1 Overstatement  (A -1)     |
-    |   6.   |   A: 0; B: 1     |   A: 0; B: 0   | -1 Understatement (B -1)     |
-    |   7.   |   A: 0; B: 0     |   A: 1; B: 0   | -1 Understatement (A +1)     |
-    |   8.   |   A: 1; B: 0     |   A: 0; B: 1   | +2 Overstatement  (A -1, B +1)     |
-    |   9.   |   A: 0; B: 1     |   A: 1; B: 0   | -2 Understatement (A +1, B -1)     |
+Each ballot is classified into one of nine categories, depending on how it affects the reported margin,
+where A is the reported winning candidate and B is the reported loser.
 
-    Note that to remove a vote from a candidate, the vote must be given to the No-vote group or another candidate.
+|  Case  |  Stated Results  |  True Results  |  Comment                     |
+|:------:|:----------------:|:--------------:|:-----------------------------|
+|   1.   |   A: 1; B: 0     |   A: 1; B: 0   | No Change (vote for winner)  |
+|   2.   |   A: 0; B: 1     |   A: 0; B: 1   | No Change (vote for loser)   |
+|   3.   |   A: 0; B: 0     |   A: 0; B: 0   | No Change (vote for neither) |
+|   4.   |   A: 0; B: 0     |   A: 0; B: 1   | +1 Overstatement  (B +1)     |
+|   5.   |   A: 1; B: 0     |   A: 0; B: 0   | +1 Overstatement  (A -1)     |
+|   6.   |   A: 0; B: 1     |   A: 0; B: 0   | -1 Understatement (B -1)     |
+|   7.   |   A: 0; B: 0     |   A: 1; B: 0   | -1 Understatement (A +1)     |
+|   8.   |   A: 1; B: 0     |   A: 0; B: 1   | +2 Overstatement  (A -1, B +1)     |
+|   9.   |   A: 0; B: 1     |   A: 1; B: 0   | -2 Understatement (A +1, B -1)     |
 
-    ## Noise and Trial Simulation
-    You can optionally add noise: random misinterpretations or marking errors that don't 
-    systematically favor either side but may affect totals.
+Note that to remove a vote from a candidate, the vote must be given to the No-vote group or another candidate.
 
-    The simulator runs a number of audit trials (typically 1000), each with a given 
-    number of sampled ballots. It visualizes the resulting distributions under H0 and H1.
+## Noise and Trial Simulation
+You can optionally add noise: random misinterpretations or marking errors that don't 
+systematically favor either side but may affect totals.
 
-    The goal is to determine whether a given sample size is sufficient to:
+The simulator runs a number of audit trials (typically 1000), each with a given 
+number of sampled ballots. It visualizes the resulting distributions under H0 and H1.
 
-    - Reject H1 if the election was honest, and
-    - Reject H0 if the election was manipulated.
+The goal is to determine whether a given sample size is sufficient to:
 
-    ## Sample Thresholds
-    There are a number of sampling thresholds associated with different risk limits. These are represented as vertical dashed lines.
-    These thresholds are set according to the crossing of distribution profiles. For example, the 5% threshold is set to the number of
-    samples such that the total number of overstatements has a 95% chance of being in the H0 distribution and a 5% chance of being in 
-    the H1 distribution.
+- Reject H1 if the election was honest, and
+- Reject H0 if the election was manipulated.
 
-    ## Application Status
-    This application is a port of a app originally written in "R" in 2019. Not all functions are fully operational but do not detract 
-    from the usefulness of this app.
+## Sample Thresholds
+There are a number of sampling thresholds associated with different risk limits. These are represented as vertical dashed lines.
+These thresholds are set according to the crossing of distribution profiles. For example, the 5% threshold is set to the number of
+samples such that the total number of overstatements has a 95% chance of being in the H0 distribution and a 5% chance of being in 
+the H1 distribution.
 
-    - Samples displayed is not fully functional. This would normally allow the user to focus in on a sub range for clarity.
-    - Settigs 'Actual RLA samples' and 'Net Overstatements in the RLA' are currently not functional. These would normally plot a
-    marker at the actual number of samples.
-    - The number of samples requires for a given risk limit does differ between this app and other calculations which are overly 
-    aggressive. This application provides sample counts that are more conservative and are reflective of the Monte Carlo analysis.
+## Application Status
+This application is a port of a app originally written in "R" in 2019. Not all functions are fully operational but do not detract 
+from the usefulness of this app.
 
-    """)
+- Samples displayed is not fully functional. This would normally allow the user to focus in on a sub range for clarity.
+- Settigs 'Actual RLA samples' and 'Net Overstatements in the RLA' are currently not functional. These would normally plot a
+marker at the actual number of samples.
+- The number of samples requires for a given risk limit does differ between this app and other calculations which are overly 
+aggressive. This application provides sample counts that are more conservative and are reflective of the Monte Carlo analysis.
+
+""")
 
     col0, col1 = st.columns(2)
 
@@ -744,61 +747,61 @@ def main():
         st.plotly_chart(fig, use_container_width=True)
         
 
-if __name__ == "__main__":
-    import sys
+# if __name__ == "__main__":
+    # import sys
 
-    # Optional: accept 'test' as CLI argument
-    if len(sys.argv) > 1 and sys.argv[1] == "test":
-        pass
+    # # Optional: accept 'test' as CLI argument
+    # if len(sys.argv) > 1 and sys.argv[1] == "test":
+        # pass
         
-        # import pprint
-        # print("Running basic test case for audit simulator...")
+        # # import pprint
+        # # print("Running basic test case for audit simulator...")
 
-        # test_state = dict(
-            # n_total=100_000,
-            # margin_pct=3.0,
-            # noise1_pct=0.2,
-            # hack2_pct=0.0,
-            # n_samples=500,
-            # n_trials=1000,
-            # )
+        # # test_state = dict(
+            # # n_total=100_000,
+            # # margin_pct=3.0,
+            # # noise1_pct=0.2,
+            # # hack2_pct=0.0,
+            # # n_samples=500,
+            # # n_trials=1000,
+            # # )
             
-        # votes, meta = gen_election_model(
-            # op_state = test_state
-        # )
+        # # votes, meta = gen_election_model(
+            # # op_state = test_state
+        # # )
 
-        # for hyp in ('H0', 'H1'):
-            # print(f"\nVotes ({hyp}):")
-            # pprint.pprint(votes[hyp], sort_dicts=False)
-            # print(f"\nMetadata ({hyp}):")
-            # pprint.pprint(meta[hyp], sort_dicts=False)
+        # # for hyp in ('H0', 'H1'):
+            # # print(f"\nVotes ({hyp}):")
+            # # pprint.pprint(votes[hyp], sort_dicts=False)
+            # # print(f"\nMetadata ({hyp}):")
+            # # pprint.pprint(meta[hyp], sort_dicts=False)
         
-        # print("Generating samples")
-        # bin_samples = generate_samples(votes, meta, n_samples=1000, n_trials=1000, replace=False)
+        # # print("Generating samples")
+        # # bin_samples = generate_samples(votes, meta, n_samples=1000, n_trials=1000, replace=False)
         
-        # pprint.pprint(bin_samples, sort_dicts=False)
+        # # pprint.pprint(bin_samples, sort_dicts=False)
     
 
-    elif len(sys.argv) > 1 and sys.argv[1] == "run_full_test":
-        print("Running full audit simulation test...")
+    # elif len(sys.argv) > 1 and sys.argv[1] == "run_full_test":
+        # print("Running full audit simulation test...")
 
-        test_state = dict(
-            n_total      = 110_000,
-            A_votes      = 51_500,
-            B_votes      = 45_500,
-            margin_pct   = 3.0,
-            noise1_pct   = 0.2,
-            hack2_pct    = 0.0,
-            n_samples    = 500,
-            n_trials     = 1000,
-            )
+        # test_state = dict(
+            # n_total      = 110_000,
+            # A_votes      = 51_500,
+            # B_votes      = 45_500,
+            # margin_pct   = 3.0,
+            # noise1_pct   = 0.2,
+            # hack2_pct    = 0.0,
+            # n_samples    = 500,
+            # n_trials     = 1000,
+            # )
             
-        fig = main_simulator(test_state)
+        # fig = main_simulator(test_state)
 
-        fig.write_html("audit_sim_output.html")
-        print("Plot saved to audit_sim_output.html")    
-    else:
-        print("No action specified. Run with 'test' or 'run_full_test' argument to execute a test case.")
+        # fig.write_html("audit_sim_output.html")
+        # print("Plot saved to audit_sim_output.html")    
+    # else:
+        # print("No action specified. Run with 'test' or 'run_full_test' argument to execute a test case.")
         
 
         
