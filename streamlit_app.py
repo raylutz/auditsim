@@ -1,6 +1,18 @@
 import streamlit as st
 from audit_simulator import main
+import markdown
 
+def markdown_with_tables(md_text: str) -> None:
+    """
+    Render Markdown text including GitHub-style tables using Streamlit.
+
+    Args:
+        md_text (str): Markdown-formatted string (including table syntax)
+    """
+    html = markdown.markdown(md_text, extensions=["tables"])
+    st.markdown(html, unsafe_allow_html=True)
+    
+    
 # ------------------------
 # Page setup and UI
 
@@ -10,7 +22,7 @@ st.set_page_config(page_title="RLA Simulator", layout="wide")
 
 st.title("RLA Simulator")
 with st.expander("ℹ️ About This Simulator (click to show/hide)"):
-    st.markdown("""
+    markdown_with_tables("""
     
 This tool simulates risk-limiting audits (RLAs) using Monte Carlo methods.
 Adjust the parameters below and click Run Simulation to visualize how audits 
