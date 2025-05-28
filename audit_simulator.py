@@ -1,5 +1,7 @@
 # audit_simulator.py
 
+# (c) Ray Lutz 2025
+
 import numpy as np
 import markdown
 import plotly.graph_objects as go
@@ -165,11 +167,11 @@ def gen_election_instance(
     Generate a single election instance (H0 or H1) using block sizes and cumulative bin boundaries.
     """
     n_total         = op_state.get('n_total',       110_000)
-    A_votes         = op_state.get('A_votes',       51_500)
-    B_votes         = op_state.get('B_votes',       48_500)
-    margin_pct      = op_state.get('margin_pct',    3)
-    noise1_pct      = op_state.get('noise1_pct',    .2)
-    hack2_pct       = op_state.get('hack2_pct',     0)
+    A_votes         = op_state.get('A_votes',        51_500)
+    B_votes         = op_state.get('B_votes',        48_500)
+    margin_pct      = op_state.get('margin_pct',    3.0)
+    noise1_pct      = op_state.get('noise1_pct',    0.2)
+    hack2_pct       = op_state.get('hack2_pct',     0.0)
 
     margin_frac = margin_pct / 100
     noise1_frac = noise1_pct / 100
@@ -563,7 +565,7 @@ def main():
 
     st.set_page_config(page_title="RLA Simulator", layout="wide")
     st.title("RLA Simulator")
-    st.info("✅ Running updated code from audit_simulator.py")
+    #st.info("✅ Running updated code from audit_simulator.py")
     
     with st.expander("ℹ️ About This Simulator (click to show/hide)"):
         markdown_with_tables("""   
@@ -602,32 +604,43 @@ Note that to remove a vote from a candidate, the vote must be given to the No-vo
 
 ## Noise and Trial Simulation
 You can optionally add noise: random misinterpretations or marking errors that don't 
-systematically favor either side but may affect totals.
+systematically favor either side but may affect totals. These represent typical mistakes made by voters.
 
 The simulator runs a number of audit trials (typically 1000), each with a given 
 number of sampled ballots. It visualizes the resulting distributions under H0 and H1.
 
+## Sample Thresholds
 The goal is to determine whether a given sample size is sufficient to:
 
 - Reject H1 if the election was honest, and
 - Reject H0 if the election was manipulated.
 
-## Sample Thresholds
 There are a number of sampling thresholds associated with different risk limits. These are represented as vertical dashed lines.
-These thresholds are set according to the crossing of distribution profiles. For example, the 5% threshold is set to the number of
+These thresholds are set according to the crossing of distribution profiles. For example, the 5% risk threshold is set to the number of
 samples such that the total number of overstatements has a 95% chance of being in the H0 distribution and a 5% chance of being in 
 the H1 distribution.
 
 ## Application Status
-This application is a port of a app originally written in "R" in 2019. Not all functions are fully operational but do not detract 
-from the usefulness of this app.
+This application is a port of a app originally written in "R" in 2019. 
+Functionality from the "R" app was not all ported to this app but may be included in the future.
 
-- Samples displayed is not fully functional. This would normally allow the user to focus in on a sub range for clarity.
-- Settigs 'Actual RLA samples' and 'Net Overstatements in the RLA' are currently not functional. These would normally plot a
-marker at the actual number of samples.
 - The number of samples requires for a given risk limit does differ between this app and other calculations which are overly 
 aggressive. This application provides sample counts that are more conservative and are reflective of the Monte Carlo analysis.
+- Unfortunately, it is difficult at present to review an an actual RLA audit and prove that auditors entered votes without any adjustments
+so entered votes reflect what was on the ballots sampled. Ballot samples should be documented by providing images so 3rd party
+reviewers can check that data entered was not forced to match the CVR, which they tend to also have at hand. This is particularly
+easy for ballot-comparison audits because there are so few ballots sampled. A smart phone camera can image the ballots, for example.
 
+### Open Issues
+
+- 'Samples displayed' is not fully functional. This would normally allow the user to focus in on a sub range for clarity.
+- 'Actual RLA samples' and 'Net Overstatements in the RLA' are currently not functional. These would normally plot a
+marker at the actual number of samples and offset so it can be compared with the distributions from the simulation.
+- Still need to implement 'ballot polling' and 'batch comparison' auditing methods. (Both were implemented in R and need to be
+ported to Python.)
+- Can also add plotting of stopping points for popular algorithms such as BRAVO, S4RLA, AUDITCLIP, and BAYESIAN.
+
+(c) 2025 Ray Lutz
 """)
 
     col0, col1 = st.columns(2)
@@ -635,8 +648,14 @@ aggressive. This application provides sample counts that are more conservative a
     ELECTION_PRESETS = {
         "Choose a preset":   {"label": "Default", 
                                 "n_total": 110000,  "A_votes": 51500,  "B_votes": 48500,  'RLA_samples':0,   'RLA_net_OS':0},
-        "NV 2024 President": {"label": "NV 2024 Presidential Contest", 
+        "NV 2024 President": {"label": "NV 2024 Presidential Contest (5% Risk Limit Ballot Comparison)", 
                                 "n_total": 1487887, "A_votes": 751205, "B_votes": 705197, 'RLA_samples':220, 'RLA_net_OS':0},
+        "GA 2024 President": {"label": "GA 2024 Presidential Contest (5% Risk Limit Batch Comparison)", 
+                                "n_total": 5297264, "A_votes": 2663117, "B_votes": 2548017, 'RLA_samples':0, 'RLA_net_OS':0,
+                                # C_votes: 20684 (Chase Oliver - Lib),
+                                # D_votes: 18229 (Jill Stein - Grn),
+                                # Total votes documented in Total Results Report as 'Ballots Cast'
+                            },
         }
                                 
 
@@ -653,7 +672,7 @@ aggressive. This application provides sample counts that are more conservative a
     with col0:
         n_total = st.number_input("Total Ballots Cast", value=preset['n_total'], key='n_total',         
                         min_value=100, max_value=100_000_000, step=1000, 
-                        help="Enter the total ballots cast in the district which includes the contest of interest.")
+                        help="Enter the total ballots cast in the district which includes the contest of interest, even if blank for this contest.")
     with col1:                                
         A_votes = st.number_input("Votes for the stated winner (A)", value=preset['A_votes'], key='A_votes',
                     min_value=100, max_value=min(100_000_000, n_total), step=1000, 
