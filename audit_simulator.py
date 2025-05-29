@@ -643,8 +643,6 @@ ported to Python.)
 (c) 2025 Ray Lutz
 """)
 
-    col0, col1 = st.columns(2)
-
     ELECTION_PRESETS = {
         "Choose a preset":   {"label": "Default", 
                                 "n_total": 110000,  "A_votes": 51500,  "B_votes": 48500,  'RLA_samples':0,   'RLA_net_OS':0},
@@ -658,6 +656,8 @@ ported to Python.)
                             },
         }
                                 
+
+    col0, col1 = st.columns(2)
 
     with col0:
         election_choice = st.selectbox("Select election preset:", options=list(ELECTION_PRESETS.keys()))
